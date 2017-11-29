@@ -1,0 +1,36 @@
+﻿Build started 1/18/2015 3:31:58 PM.
+     1>Project "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\DiffusionEquationInCUDA_Project1\DiffusionEquationInCUDA_Project1.vcxproj" on node 2 (Build target(s)).
+     1>AddCudaCompileDeps:
+         C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /D_DEBUG /D_CONSOLE /D_UNICODE /DUNICODE /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\include" /I. /FIcuda_runtime.h /c "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\DiffusionEquationInCUDA_Project1\DiffusionEquation.cu" 
+       CudaBuild:
+         Compiling CUDA source file DiffusionEquation.cu...
+         cmd.exe /C "C:\Users\DucDQ\AppData\Local\Temp\tmp1e552f49b0194665a8ebc895426ef8b8.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\bin\nvcc.exe" -gencode=arch=compute_10,code=\"sm_10,compute_10\" --use-local-env --cl-version 2012 -ccbin "C:\Program Files\Microsoft Visual Studio 11.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile -cudart static  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\DiffusionEquation.cu.obj "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\DiffusionEquationInCUDA_Project1\DiffusionEquation.cu"
+         
+         C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\DiffusionEquationInCUDA_Project1>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\bin\nvcc.exe" -gencode=arch=compute_10,code=\"sm_10,compute_10\" --use-local-env --cl-version 2012 -ccbin "C:\Program Files\Microsoft Visual Studio 11.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\include"  -G   --keep-dir Debug -maxrregcount=0  --machine 32 --compile -cudart static  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o Debug\DiffusionEquation.cu.obj "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\DiffusionEquationInCUDA_Project1\DiffusionEquation.cu" 
+     1>nvcc : warning : The 'compute_10' and 'sm_10' architectures are deprecated, and may be removed in a future release.
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(261): warning : statement is unreachable
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(114): warning : variable "start" was declared but never referenced
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(114): warning : variable "stop" was declared but never referenced
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(115): warning : variable "elapsed_time" was declared but never referenced
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(261): warning : statement is unreachable
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(114): warning : variable "start" was declared but never referenced
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(114): warning : variable "stop" was declared but never referenced
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(115): warning : variable "elapsed_time" was declared but never referenced
+         DiffusionEquation.cu
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(36): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(37): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(106): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(114): warning C4101: 'stop' : unreferenced local variable
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(115): warning C4101: 'elapsed_time' : unreferenced local variable
+     1>C:/ProgramData/NVIDIA Corporation/CUDA Samples/v6.0/8_SoICT_HUST/SolvingDiffusionEquationInCUDA/DiffusionEquationInCUDA_Project1/DiffusionEquation.cu(114): warning C4101: 'start' : unreferenced local variable
+       Link:
+         C:\Program Files\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\Debug\SolvingDiffusionEquationInCUDA.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.0\lib\Win32" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\Debug\SolvingDiffusionEquationInCUDA.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\Debug\SolvingDiffusionEquationInCUDA.lib" /MACHINE:X86 Debug\DiffusionEquation.cu.obj
+         Debug\SolvingDiffusionEquationInCUDA.obj
+         Debug\stdafx.obj
+         DiffusionEquationInCUDA_Project1.vcxproj -> C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\Debug\SolvingDiffusionEquationInCUDA.exe
+     1>Done Building Project "C:\ProgramData\NVIDIA Corporation\CUDA Samples\v6.0\8_SoICT_HUST\SolvingDiffusionEquationInCUDA\DiffusionEquationInCUDA_Project1\DiffusionEquationInCUDA_Project1.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:08.85
