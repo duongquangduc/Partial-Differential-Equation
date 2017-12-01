@@ -1,6 +1,7 @@
-/*TRUONG DAI HOC BACH KHOA HA NOI*/
-/*VIEN CONG NGHE THONG TIN VA TRUYEN THONG*/
+/*TRUONG DAI HOC BACH KHOA HA NOI - HANOI UNIVERSITY OF SCIENCE AND TECHNOLOGY*/
+/*VIEN CONG NGHE THONG TIN VA TRUYEN THONG - SCHOOL OF INFORMATION AND COMMUNICATION TECHNOLOGY*/
 
+/*import libraries*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
@@ -11,16 +12,16 @@
 #include <device_launch_parameters.h>
 #pragma comment(lib, "cudart")
 
-/*dat USE_CPU = 1 thuc hien tinh toan tren CPU*/
-/*dat USE_GPU = 1 thuc hien tinh toan tren GPU*/
+/*set USE_CPU = 1 to compute in CPU*/
+/*set USE_GPU = 0 to compute in GPU*/
 
 #define USE_CPU 1
 #define USE_GPU 0
 
-/*dinh nghia macro chi thi I2D xac dinh chi so cac phan tu tren luoi 2 chieu*/
+/*define macro I2D: index of elements in 2D-grid*/
 #define I2D(ni, i, j) ((i) + (ni)*(j))
 
-/*ham thuc hien tinh nhiet do/nong do khuech tan - thuc hien tren CPU*/
+/*compute temperature or diffusion concentration on CPU*/
 void cpu_DiffusionEquation(int ni, 
 						   int nj,
 						   float dt, 
@@ -32,30 +33,30 @@ void cpu_DiffusionEquation(int ni,
 	float td = 1.0;						/*td: thermal diffusity - he so khuech tan nhiet*/
     float d2tdx2, d2tdy2;
 
-	/*roi rac hoa theo khong gian - spatial dicretization*/
-    /*lap tren tat ca cac diem cua mien tinh toan (ngoai tru cac diem bien)*/
+    /*spatial dicretization - roi rac hoa theo khong gian*/
+    /*iterate through all the points in computing domain (except margin points)*/
     for (j=1; j < nj-1; j++) {
         for (i=1; i < ni-1; i++) {
 
-		/*cac chi cua cac diem trung tam va cac diem lan can - cong thuc tinh theo macro I2D*/
+	    /*indexes of center and neighborhoods I2D*/
             i00 = I2D(ni, i, j);
             im10 = I2D(ni, i-1, j);
             ip10 = I2D(ni, i+1, j);
             i0m1 = I2D(ni, i, j-1);
             i0p1 = I2D(ni, i, j+1);
 
-	    /*tinh cac dao ham*/
+	    /*calculate derivates*/
             d2tdx2 = (temp_in[im10] - 2*temp_in[i00] + temp_in[ip10])/(dx*dx);
             d2tdy2 = (temp_in[i0m1] - 2*temp_in[i00] + temp_in[i0p1])/(dy*dy);
 		
-		/*tich hop theo thoi gian - time integration*/
-	    /*cap nhat nhiet do tai diem trung tam*/
+	    /*time integration - tich hop theo thoi gian*/
+	    /*update temperature in center point*/
             temp_out[i00] = temp_in[i00] + dt*td*(d2tdx2 + d2tdy2);
         }
     }
 }
 
-/*ham kernel thuc hien tinh nhiet do/nong do khuech tan - thuc hien tren GPU*/
+/*kernel funtion compute temperature/diffusion concentration on GPU */
 __global__ void gpu_DiffusionEquation(int ni, 
                                       int nj,
                                       float dt,
@@ -67,27 +68,26 @@ __global__ void gpu_DiffusionEquation(int ni,
 	float td = 1.0;
 	float d2tdx2, d2tdy2;
 	
-	/*cac chi so i va j cua cac thread*/
-	i = blockIdx.x*blockDim.x + threadIdx.x;
+    /*the indexes i and j of threads*/
+    i = blockIdx.x*blockDim.x + threadIdx.x;
     j = blockIdx.y*blockDim.y + threadIdx.y;
 
-	/*cac chi cua cac diem trung tam va cac diem lan can - cong thuc tinh theo macro I2D*/
+    /*indexes of center and neighborhoods I2D*/
     i00 = I2D(ni, i, j);
     im10 = I2D(ni, i-1, j);
     ip10 = I2D(ni, i+1, j);
     i0m1 = I2D(ni, i, j-1);
     i0p1 = I2D(ni, i, j+1);
     
-	/*kiem tra cac thread trong vung tinh toan (khong tinh cac diem tren bien hoac ben ngoai)*/
+    /*check threads in computating domain (except margin points)*/
     if (i > 0 && i < ni-1 && j > 0 && j < nj-1) {
-            /*roi rac hoa theo khong gian - spatial discretization*/
-			/*tinh cac dao ham*/
+            /*spatial discretization*/
+	    /*tinh cac dao ham*/
             d2tdx2 = (temp_in[im10] - 2*temp_in[i00] + temp_in[ip10])/(dx*dx);
             d2tdy2 = (temp_in[i0m1] - 2*temp_in[i00] + temp_in[i0p1])/(dy*dy);
    	             
-			/*tich hop theo thoi gian - time integration*/
-			/*tinh cac nhiet do/nong do khuech tan tai moi diem*/
-            temp_out[i00] = temp_in[i00] + dt*td*(d2tdx2 + d2tdy2);        
+	    /*time integration*/
+	    temp_out[i00] = temp_in[i00] + dt*td*(d2tdx2 + d2tdy2);        
     }
 }
 
@@ -105,22 +105,21 @@ int main(int argc, char *argv[])
 	clock_t startclock, stopclock;
 	double elapsedtime;  
    										
-	cudaEvent_t start, stop;						/*su dung cuda events do thoi gian thuc hien*/
+	cudaEvent_t start, stop;				/*use cuda events to measure performance*/
 	float elapsed_time;	
 
-    FILE *fp;										/*ghi ket qua ra file*/
+    FILE *fp;										
    
-	/*dinh nghia kich thuoc luoi diem tinh toan va so buoc thoi gian tich hop*/
+    /*define the size of grid and time step*/
     ni = 2048;
     nj = 2048;
     nstep = 10000;
     
-	/*cap phat bo nho mang nhiet do tren host*/
+    /*allocate memory on host*/
     h_temp1 = (float *)malloc(sizeof(float)*ni*nj);
     h_temp2 = (float *)malloc(sizeof(float)*ni*nj);
 
- 	/*khoi tao gia tri ban dau cho cac diem trong vung tinh toan*/
-	/*data sample*/
+    /*data sample*/
     for (i=1; i < ni-1; i++) {
         for (j=1; j < nj-1; j++) {
             i2d = j + ni*i;
@@ -128,62 +127,62 @@ int main(int argc, char *argv[])
         }
     }
     
-	/*khoi tao du lieu tai cac diem bien - cac diem goc canh*/
-	/*bl-bottom left br-bottom right tl-top left tr-top right*/
+    /*initialize values for margins*/
+    /*bl-bottom left br-bottom right tl-top left tr-top right*/
     temp_bl = 200.0f;
     temp_br = 500.0f;
     temp_tl = 200.0f;
     temp_tr = 500.0f;
 
-	/*thiet lap nhiet do cac diem tren cac canh thong qua cac diem goc bang cach noi suy*/
+    /*set temperature of points in edges*/
     for (i=0; i < ni; i++) {
-        /*bottom - canh duoi (temp_bl = 200.0f, temp_br = 500.0f)*/
+        /*bottom (temp_bl = 200.0f, temp_br = 500.0f)*/
         j = 0;
         i2d = i + ni*j;
         h_temp1[i2d] = temp_bl + (temp_br-temp_bl)*(float)i/(float)(ni-1);
 
-        /*top - canh tren (temp_tl = 200.0f, temp_tr = 500.0f)*/
+        /*top (temp_tl = 200.0f, temp_tr = 500.0f)*/
         j = nj-1;
         i2d = i + ni*j;
         h_temp1[i2d] = temp_tl + (temp_tr-temp_tl)*(float)i/(float)(ni-1);
     }
 
     for (j=0; j < nj; j++) {
-        /*left - canh trai (temp_bl = 200.0f, temp_tl = 200.0f)*/
+        /*left (temp_bl = 200.0f, temp_tl = 200.0f)*/
         i = 0;
         i2d = i + ni*j;
         h_temp1[i2d] = temp_bl + (temp_tl-temp_bl)*(float)j/(float)(nj-1);
 
-        /*right -  canh phai (temp_br = 500.0f, temp_tr = 500.0f)*/
+        /*right (temp_br = 500.0f, temp_tr = 500.0f)*/
         i = ni-1;
         i2d = i + ni*j;
 	    h_temp1[i2d] = temp_br + (temp_tr-temp_br)*(float)j/(float)(nj-1);
     }
 
-	/*sao chep du lieu tu mang h_temp1 sang h_temp2*/
+	/*copy data from h_temp1 to h_temp2*/
 	cudaMemcpy(h_temp2, h_temp1, sizeof(float)*ni*nj, cudaMemcpyHostToHost);
 	      
-	/*cap phat mang luu tru nhiet do tren thiet bi*/
+	/*allocate array for storing temperature on device*/
     cudaMalloc((void **)&d_temp1, sizeof(float)*ni*nj);
     cudaMalloc((void **)&d_temp2, sizeof(float)*ni*nj);
 
-	/*truyen du lieu nhiet do tu host toi thiet bi*/
+	/*transfer data from host to device*/
     cudaMemcpy((void *)d_temp1, (void *)h_temp1, sizeof(float)*ni*nj, cudaMemcpyHostToDevice);
     cudaMemcpy((void *)d_temp2, (void *)h_temp1, sizeof(float)*ni*nj, cudaMemcpyHostToDevice);
     
     
-//    cudaEventCreate(&start);						/*do thoi gian bat dau su dung <cuda_runtime.h>*/
+//    cudaEventCreate(&start);					                /*measure performance with <cuda_runtime.h>*/
 //	  cudaEventCreate(&stop);
 //    cudaEventRecord(start, 0);
 
-	startclock = clock();							/*do thoi gian su dung thu vien C: <time.h>*/
+	startclock = clock();							/*measure performance with <time.h>*/
 
     for (istep=0; istep < nstep; istep++) {
         //printf("%i\n", istep);
 		if (USE_CPU == 1) {                                           
             cpu_DiffusionEquation(ni, nj, dt, h_temp1, h_temp2);
 	    
-			// doi cho cac con tro cac mang nhiet do
+	    // change pointers
             tmp_temp = h_temp1;
             h_temp1 = h_temp2;
             h_temp2 = tmp_temp;
@@ -191,13 +190,13 @@ int main(int argc, char *argv[])
         }
 		if (USE_GPU == 1) {
 	    
-			// dinh nghia cau truc luoi va khoi
-			dim3 Grid(Grid_Dim, Grid_Dim);			/*cau truc luoi*/
-			dim3 Block(Block_Dim, Block_Dim);		/*cau truc khoi*/			           
+			// define architure of grid and block 
+			dim3 Grid(Grid_Dim, Grid_Dim);			
+			dim3 Block(Block_Dim, Block_Dim);					           
             
-			/*goi ham kernel tinh toan tren GPU*/ 
+	    /*invoke kernel for GPU computing*/ 
             gpu_DiffusionEquation<<<Grid, Block>>>(ni, nj, dt, d_temp1, d_temp2);
-            /*doi cho cac con tro cac mang nhiet do*/						     
+            /*change pointers*/						     
             tmp_temp = d_temp1;
             d_temp1 = d_temp2;
             d_temp2 = tmp_temp;
@@ -206,21 +205,20 @@ int main(int argc, char *argv[])
 
 	stopclock = clock();
 	elapsedtime = ((double)(stopclock-startclock))/CLOCKS_PER_SEC;
-	printf("Thoi gian tinh toan: %f s.\n", elapsedtime);
+	printf("Time execution: %f s.\n", elapsedtime);
 
 //  cudaThreadSynchronize();
-//	cudaEventRecord(stop, 0);									//do thoi gian ket thuc
+//	cudaEventRecord(stop, 0);									//mesure end time
 //	cudaEventSynchronize(stop);
 //	cudaEventElapsedTime(&elapsed_time, start, stop);
-//  printf("\nThoi gian tinh toan: %f ms.\n", elapsed_time);
+//  printf("\nTime execution: %f ms.\n", elapsed_time);
 
-	/*sao chep mang ket qua tu GPU toi CPU*/
+	/*copy data from GPU to CPU*/
 	if (USE_CPU == 0) {
         cudaMemcpy((void *)h_temp1, (void *)d_temp1, sizeof(float)*ni*nj, cudaMemcpyDeviceToHost);
     }
     
-	/*ghi ket qua vao cac file cpu_output va gpu_out de so sanh*/
-
+	/*save data*/
 	if(USE_CPU == 1){
 		fp = fopen("cpu_output.dat", "w");
 		fprintf(fp, "%i %i", ni, nj);
@@ -242,7 +240,7 @@ int main(int argc, char *argv[])
 		fclose(fp);
 	}
 	
-	/*giai phong bo nho tren GPU va CPU*/
+	/*free memory GPU va CPU*/
 	free(h_temp1);
 	free(h_temp2);
 	cudaFree(d_temp1);
