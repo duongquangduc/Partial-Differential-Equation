@@ -82,7 +82,7 @@ __global__ void gpu_DiffusionEquation(int ni,
     /*check threads in computating domain (except margin points)*/
     if (i > 0 && i < ni-1 && j > 0 && j < nj-1) {
             /*spatial discretization*/
-	    /*tinh cac dao ham*/
+	    /*calculate derivates*/
             d2tdx2 = (temp_in[im10] - 2*temp_in[i00] + temp_in[ip10])/(dx*dx);
             d2tdy2 = (temp_in[i0m1] - 2*temp_in[i00] + temp_in[i0p1])/(dy*dy);
    	             
